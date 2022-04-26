@@ -1,56 +1,54 @@
 <?php
-// Routing includes setting of HTTP headers.
+namespace Main;
+
+/**
+ * Contains the routes to the controllers or wherever you point them to.
+ */
 class Routes {
 
+    /**
+     * @var array $List
+     * Contains routes for the app.
+     */
     private static array $List;
 
     public function __construct() {
         self::$List = [
-            // URI => [view name/controller, function, http request type],
+
+            // URI => [Controller, function, HTTP request type],
             // GET requests can also be processed by adding a route.
-            // e.g. 'home/index?*' => ['home', '', '']
-            // '/?*' => ['home', '' ,''], // This route is only for InfinityFree.
-            'default' => ['home'],
-            'home/index' => ['home', '', ''],
-            'dashboard/index' => ['dashboard', '', ''],
-            'accounts/index' => ['accounts', '', ''],
-            'accounts/index?*' => ['accounts', '', ''],
-            'accounts/view/*' => ['FetchController', 'account', 'GET'],
-            'accounts/delete/*' => ['UpdateController', 'deleteAccount', 'GET'],
-            'auth/login' => ['AuthController', 'login', 'POST'],
-            'auth/logout' => ['AuthController', 'logout', 'POST'],
-            'fetch/accounts' => ['FetchController', 'accounts', 'POST'],
-            'fetch/accounts?*' => ['FetchController', 'accountsWithFilter', 'GET'],
-            'fetch/billing' => ['FetchController', 'billing', 'POST'],
-            'customer/index' => ['customer', '', ''],
-            'customer/view/*' => ['UpdateController', 'customer', 'GET'],
-            'customer/delete/*' => ['UpdateController', 'customer', 'GET'],
-            'accounts/new' => ['newaccount', '', ''],
-            'accounts/create' => ['CreateController', 'account', 'POST'],
-            'mail/send' => ['MailController', 'sendMail', 'POST'],
-            'users/index' => ['users', '', ''],
-            'fetch/users' => ['FetchController', 'users', 'GET'],
-            'billing/update' => ['UpdateController', 'updateBilling', 'POST'],
-            'fetch/balance' => ['FetchController', 'balance', 'POST'],
-            'fetch/allaccountscount' => ['FetchController', 'allaccountscount', 'POST'],
-            'fetch/allbillingcount' => ['FetchController', 'allbillingcount', 'POST'],
+            // e.g. 'home/index?*' => ['ViewController', 'home', '']
+            // The last part may be ommited if there is no POST or GET request
+            //    to be processed by the correspoding controller.
+
+            'error/403'    => ['ViewsController', 'e403'],
+            'error/404'    => ['ViewsController', 'e404'],
+            'default'      => ['ViewsController', 'home'],
+            'home/index'   => ['ViewsController', 'home'],
+            'test/fetch'   => ['TestController',  'fetch'],
+
         ];
     }
 
+    /**
+     * @method public getRoute()
+     * Returns corresponding route in $List.
+     * @param string $URI
+     */
     public static function getRoute($URI): array {
         $keys = array_keys(self::$List);
-        foreach ($keys as $key) {
-            if (fnmatch($key, $URI)) {
-                return self::getRouteArray($key, $URI);
-            }
-        }
+        foreach ($keys as $key) if (fnmatch($key, $URI)) return self::$List[$URI];
+        return ['ViewsController', 'e404'];
     }
 
-    private static function getRouteArray($key, $URI): array {
-        $route = self::$List[$key];
-        $exploded_URI = explode('/', $URI);
-        if (isset($exploded_URI[2])) array_push($route, $exploded_URI[2]);
-        return $route == null ? ['e404'] : $route;
+    /**
+     * @method public setRoute()
+     * Sets a route in $List.
+     * @param string $URI
+     * @param string $route
+     */
+    public static function setRoute($URI, $route): void {
+        self::$List[$URI] = $route;
     }
 
 }

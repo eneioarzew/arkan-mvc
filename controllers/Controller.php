@@ -1,27 +1,39 @@
 <?php
+namespace Main\Controllers;
+
+/**
+ * Main controller class for retrieving resources.
+ */
 class Controller {
 
-    public function getResource($URI_array, $GET_BODY, $POST_BODY): array {
-        $ViewsController = new ViewsController();
-        $Routes = new Routes();
-        $route = $Routes->getRoute(implode('/', $URI_array));
-        if (!$URI_array[2]) $GET_DATA = $GET_BODY;
-        else $GET_DATA = strval($URI_array[2]);
-        if(empty($route[2])) {
-            $function = $route[0];
-            $resource = ['type' => 'view', 'body' => $ViewsController->$function()];
+    /**
+     * Returns either a freshly rendered resource or a resource from cache.
+     * =+= This function can be paired with data caching in future updates. =+=
+     */
+
+    /**
+     * @method public getResource()
+     * @param array $route
+     * @param array $GET_DATA
+     * @param array $POST_DATA
+     */
+    public function getResource($route, $GET_DATA, $POST_DATA): array {
+        $Controller = new $route[0]();
+        $function = $route[1];
+        $request_type = $route[2];
+        $data = null;
+        $type = "ASSET";
+        if (isset($request_type) || !empty($request_type)){
+            if ($request_type == 'GET') $data = $GET_DATA;
+            if ($request_type == 'POST') $data = $POST_DATA;
+            $type = $request_type;
         }
-        else {
-            $class = new $route[0]();
-            $function = $route[1];
-            $request_type = $route[2];
-            if($request_type == 'POST') {
-                $resource = ['type' => 'data', 'body' => (new $class)->$function($POST_BODY)];
-            }
-            else if($request_type == 'GET') {
-                $resource = ['type' => 'data', 'body' => (new $class)->$function($GET_DATA)];
-            }
-        }
+        $resource = [
+            'type' => $type,
+            'data' => $Controller->$function($data),
+            'name' => (string)$function,
+        ];
+        $resource ?: $resource = null;
         return $resource;
     }
 
