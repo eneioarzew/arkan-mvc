@@ -1,2 +1,2 @@
 # arkan-mvc (discontinued)
-This project is shelved in favor of a RESTful backend framework.
+This project is shelved in favor of another pattern.
