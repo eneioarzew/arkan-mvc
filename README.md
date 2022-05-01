@@ -1,2 +1,2 @@
-# arkan-mvc (discontinued)
-This project is shelved in favor of another pattern.
+# arkan-mvc
+Simple PHP MVC framework for small–medium scale purposes.
